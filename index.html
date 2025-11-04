@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ma Boutique</title>
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f4f4f4;
+      color: #222;
+    }
+
+    header {
+      background: #222;
+      color: white;
+      padding: 15px 0;
+      text-align: center;
+      font-size: 1.6em;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    header .logo {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.2);
+      background: #fff;
+    }
+
+    nav {
+      background: #333;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 12px 18px;
+      display: inline-block;
+      transition: 0.2s;
+    }
+
+    nav a:hover {
+      background: #0078d7;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      flex: 1 0 auto;
+    }
+
+    section {
+      display: none;
+    }
+
+    section.active {
+      display: block;
+    }
+
+    /* Grille de cartes (cases) pour les produits */
+    .produits {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 15px;
+      align-items: start;
+    }
+
+    .produit {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      transition: transform 0.18s, box-shadow 0.18s;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .produit:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+    }
+
+    /* Image plus grande, couvrante et centrée dans la case */
+    .produit img {
+      width: 100%;
+      height: 220px; /* agrandi */
+      object-fit: cover;
+      border-radius: 8px;
+      display: block;
+    }
+
+    .produit h3 {
+      margin: 6px 0 2px;
+      font-size: 1.05rem;
+      text-align: left;
+    }
+
+    .produit p {
+      margin: 0;
+      color: #555;
+      text-align: left;
+      flex-grow: 0;
+    }
+
+    .produit .actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    button, .btn {
+      background: #0078d7;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    button:hover, .btn:hover {
+      background: #005fa3;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .total {
+      text-align: right;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    .vider {
+      display: block;
+      margin: 15px auto;
+      background: #e53935;
+    }
+
+    .vider:hover {
+      background: #b71c1c;
+    }
+
+    form {
+      max-width: 500px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input, textarea {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
+
+    footer {
+      background: #222;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: auto;
+      flex-shrink: 0;
+    }
+
+    .search-bar {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .search-bar input {
+      width: 80%;
+      max-width: 480px;
+      padding: 10px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    /* Skip link */
+    .skip-link {
+      position: absolute;
+      left: -999px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+    .skip-link:focus {
+      left: 10px;
+      top: 10px;
+      width: auto;
+      height: auto;
+      padding: 8px 12px;
+      background: #0078d7;
+      color: #fff;
+      z-index: 1000;
+      border-radius: 4px;
+    }
+
+    /* focus visible */
+    a:focus, button:focus, input:focus, select:focus, textarea:focus {
+      outline: 3px solid #ffbf47;
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 900px) {
+      .produit img { height: 200px; }
+    }
+    @media (max-width: 600px) {
+      header { font-size: 1.3em; }
+      nav a { padding: 10px; }
+      .produits { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+      .produit img { height: 160px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- lien pour aller directement au contenu -->
+  <a class="skip-link" href="#accueil">Aller au contenu</a>
+
+    <header>
+      <img src="image logo" alt="Logo Aviterroir" class="logo">
+      <h1>Aviterroir — Vente de poulets de chair</h1>
+    </header>
+
+  <nav role="navigation" aria-label="Navigation principale">
+    <a href="javascript:void(0)" onclick="afficherSection('accueil', event)">Accueil</a>
+    <a href="javascript:void(0)" onclick="afficherSection('produits', event)">Produits</a>
+    <a href="javascript:void(0)" onclick="afficherSection('commande', event)">Commande</a>
+    <a href="javascript:void(0)" onclick="afficherSection('contact', event)">Contact</a>
+    <a href="javascript:void(0)" onclick="afficherSection('apropos', event)">À propos</a>
+  </nav>
+
+  <div class="container">
+    <!-- Accueil -->
+    <section id="accueil" class="active">
+      <h2>Bienvenue sur notre boutique</h2>
+      <p>Découvrez nos produits de qualité et commandez facilement en ligne. Nous vous offrons le meilleur rapport qualité/prix.</p>
+
+      <!-- Galerie mise en avant -->
+      <div class="hero" style="margin-top:20px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;">
+          <figure style="margin:0; border-radius:8px; overflow:hidden; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+            <img src="poulets 3500" alt="Poulet 1,5 kg" style="width:100%; height:140px; object-fit:cover;">
+            <figcaption style="padding:8px; font-size:0.95em;">Poulet 1,5 kg — Prêt à consommer</figcaption>
+          </figure>
+          <figure style="margin:0; border-radius:8px; overflow:hidden; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+            <img src="poulets 4000" alt="Poulet 2 kg" style="width:100%; height:140px; object-fit:cover;">
+            <figcaption style="padding:8px; font-size:0.95em;">Poulet 2 kg — Tendre et savoureux</figcaption>
+          </figure>
+          <figure style="margin:0; border-radius:8px; overflow:hidden; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+            <img src="poulets 2,5kg" alt="Poulet 2,5 kg" style="width:100%; height:140px; object-fit:cover;">
+            <figcaption style="padding:8px; font-size:0.95em;">Poulet 2,5 kg — Idéal pour repas de groupe</figcaption>
+          </figure>
+        </div>
+
+        <div style="text-align:center; margin-top:14px;">
+          <a class="btn" href="#" onclick="afficherSection('produits')">Voir tous les produits</a>
+          <a class="btn" href="#" style="margin-left:10px; background:#27ae60;" onclick="afficherSection('commande')">Commander maintenant</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Produits -->
+    <section id="produits">
+      <h2>Nos Produits</h2>
+      <div class="search-bar">
+        <input type="text" id="recherche" placeholder="🔍 Rechercher un produit..." onkeyup="filtrerProduits()">
+      </div>
+      <div class="produits" id="listeProduits">
+        <div class="produit" data-nom="Poulets 2,5kg">
+          <img src="poulets 2,5kg" alt="Poulets 2,5kg">
+          <h3>Poulets 2,5kg</h3>
+          <p>Prix : 4500 F</p>
+          <button onclick="ajouter('Poulets 2,5kg', 4500)">Ajouter au panier</button>
+        </div>
+        <div class="produit" data-nom="Poulets 1kg">
+          <img src="poulets 1kg" alt="Poulets 1kg">
+          <h3>Poulets 1kg</h3>
+          <p>Prix : 2500 F</p>
+          <button onclick="ajouter('Poulets 1kg', 2500)">Ajouter au panier</button>
+        </div>
+        <div class="produit" data-nom="Poulets 2kg">
+          <img src="poulets 4000" alt="Poulets 2kg">
+          <h3>Poulets 2kg</h3>
+          <p>Prix : 4000 F</p>
+          <button onclick="ajouter('Poulets 2kg', 4000)">Ajouter au panier</button>
+        </div>
+        <div class="produit" data-nom="Poulet 1,5kg">
+          <img src="poulets 3500" alt="Poulet 1,5kg">
+          <h3>Poulet 1,5 kg</h3>
+          <p>Prix : 3500 F</p>
+          <button onclick="ajouter('Poulet 1,5 kg', 3500)">Ajouter au panier</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Commande -->
+    <section id="commande">
+      <h2>Votre commande</h2>
+
+      <div style="display:flex;gap:24px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:300px;">
+          <h3>Panier</h3>
+          <ul id="liste" aria-live="polite"></ul>
+          <p class="total" id="total"></p>
+          <button class="vider" onclick="viderPanier()">Vider le panier</button>
+        </div>
+
+        <div style="flex:1;min-width:300px;">
+          <h3>Informations pour la livraison</h3>
+          <form id="orderForm" onsubmit="event.preventDefault(); validateOrder();">
+            <input id="orderName" name="name" type="text" placeholder="Nom complet" required>
+            <input id="orderPhone" name="phone" type="tel" placeholder="Téléphone (ex: +221783856205)" required>
+            <input id="orderAddress" name="address" type="text" placeholder="Adresse de livraison" value="Rue 10, Keur Mbaye Fall, Dakar" required>
+            <label for="paymentMethod">Mode de paiement</label>
+            <select id="paymentMethod" name="payment">
+              <option value="Paiement à la livraison">Paiement à la livraison</option>
+            
+      
+            </select>
+
+            <input type="hidden" name="_subject" value="Nouvelle commande Aviterroir">
+
+            <div style="margin-top:12px;">
+              <button id="validateOrderBtn" type="button" onclick="validateOrder()">Valider la commande</button>
+            </div>
+            <p id="orderStatus" role="status" aria-live="polite" style="text-align:center;margin-top:8px;"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact">
+      <h2>Contactez-nous</h2>
+      <p><strong>Téléphone :</strong> +221 783856205 / +221 753505803</p>
+      <p><strong>Adresse :</strong> Rue 10, Keur Mbaye Fall, Dakar</p>
+
+      <form id="contactForm" action="https://formspree.io/f/mblpvzrr" method="POST" aria-label="Formulaire de contact">
+        <label for="cf-name" class="sr-only">Nom</label>
+        <input id="cf-name" name="name" type="text" placeholder="Votre nom" required>
+        <label for="cf-email" class="sr-only">Email</label>
+        <input id="cf-email" name="email" type="email" placeholder="Votre email" required>
+        <input type="hidden" name="_subject" value="Nouveau message site Aviterroir">
+        <label for="cf-message" class="sr-only">Message</label>
+        <textarea id="cf-message" name="message" placeholder="Votre message..." rows="5" required></textarea>
+        <button type="submit">Envoyer</button>
+        <p id="formStatus" role="status" aria-live="polite" style="text-align:center;margin-top:8px"></p>
+      </form>
+    </section>
+
+    <!-- À propos -->
+    <section id="apropos">
+      <h2>À propos</h2>
+      <p>
+        Aviterroir est une entreprise avicole implantée à Keur Mbaye Fall, Rue 10. Nous sommes spécialisés dans l’élevage et la vente de poulets de chair de qualité supérieure.
+        Nos volailles sont nourries avec soin et élevées dans un environnement sain pour garantir une viande tendre, naturelle et savoureuse.
+      </p>
+
+      <h3>Notre mission</h3>
+      <p>
+        Produire et livrer des poulets de chair de qualité tout en valorisant le savoir‑faire local. Nous nous engageons pour la transparence, le bien‑être animal et la satisfaction client.
+      </p>
+
+      <h3>Nos engagements</h3>
+      <ul>
+        <li>Qualité garantie — respect des normes sanitaires et contrôle qualité</li>
+        <li>Production 100% locale — fierté du terroir sénégalais</li>
+        <li>Livraison partout à Dakar — service rapide et soigné</li>
+      </ul>
+
+      <p>Pour toute commande ou renseignement, allez sur la page « Commander » ou contactez‑nous via le formulaire.</p>
+    </section>
+  </div>
+
+  <footer>
+    © 2025 Ma Boutique — Tous droits réservés
+  </footer>
+
+  <script>
+    // --- Navigation entre les sections ---
+    function afficherSection(id, evt) {
+      if (evt && typeof evt.preventDefault === 'function') evt.preventDefault();
+
+      const sections = document.querySelectorAll("section");
+      sections.forEach(s => {
+        s.style.display = 'none';
+        s.classList.remove('active');
+      });
+
+      const target = document.getElementById(id);
+      if (target) {
+        target.style.display = 'block';
+        target.classList.add('active');
+        // optionnel : remettre le scroll en haut du container
+        const container = document.querySelector('.container');
+        if (container) container.scrollTop = 0;
+        else window.scrollTo(0,0);
+      }
+    }
+
+    // --- Initialisation au chargement ---
+    document.addEventListener('DOMContentLoaded', function() {
+      // cache toutes les sections puis affiche l'accueil
+      const sections = document.querySelectorAll("section");
+      sections.forEach(s => { s.style.display = 'none'; s.classList.remove('active'); });
+      const first = document.getElementById('accueil') || document.querySelector('section');
+      if (first) { first.style.display = 'block'; first.classList.add('active'); }
+
+      // initialiser panier et affichage existants
+      afficher();
+    });
+
+    // --- Panier ---
+    let panier = JSON.parse(localStorage.getItem('panier')) || [];
+
+    function ajouter(nom, prix) {
+      panier.push({ nom, prix });
+      localStorage.setItem('panier', JSON.stringify(panier));
+      afficher();
+      alert(nom + " ajouté au panier !");
+    }
+
+    function afficher() {
+      const liste = document.getElementById('liste');
+      const totalDiv = document.getElementById('total');
+      if(!liste) return;
+      liste.innerHTML = '';
+      let total = 0;
+
+      if (panier.length === 0) {
+        liste.innerHTML = '<p style="text-align:center;">Votre panier est vide.</p>';
+        totalDiv.textContent = '';
+        return;
+      }
+
+      panier.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `${item.nom} — ${item.prix} F 
+                        <button onclick="supprimer(${index})">❌</button>`;
+        liste.appendChild(li);
+        total += item.prix;
+      });
+
+      totalDiv.textContent = "Total : " + total + " F";
+    }
+
+    function supprimer(index) {
+      panier.splice(index, 1);
+      localStorage.setItem('panier', JSON.stringify(panier));
+      afficher();
+    }
+
+    function viderPanier() {
+      panier = [];
+      localStorage.removeItem('panier');
+      afficher();
+    }
+
+    // --- Recherche de produits (déjà présente) ---
+    function filtrerProduits() {
+      const recherche = document.getElementById("recherche") ? document.getElementById("recherche").value.trim().toLowerCase() : '';
+      const container = document.getElementById("listeProduits");
+      const produits = container ? container.querySelectorAll(".produit") : document.querySelectorAll(".produit");
+      let anyVisible = false;
+
+      produits.forEach(p => {
+        const nom = (p.getAttribute("data-nom") || p.textContent || "").toLowerCase();
+        if (recherche === "" || nom.includes(recherche)) {
+          p.style.display = ""; // restaure l'affichage (grid)
+          anyVisible = true;
+        } else {
+          p.style.display = "none";
+        }
+      });
+
+      let msg = document.getElementById('noResultsMsg');
+      if (!msg && container) {
+        msg = document.createElement('p');
+        msg.id = 'noResultsMsg';
+        msg.style.textAlign = 'center';
+        msg.style.marginTop = '10px';
+        container.parentNode.insertBefore(msg, container.nextSibling);
+      }
+      if (msg) msg.textContent = anyVisible ? '' : 'Aucun produit trouvé.';
+    }
+
+    // Envoi du formulaire via fetch (Formspree)
+    document.addEventListener('DOMContentLoaded', function(){
+      const form = document.getElementById('contactForm');
+      if (!form) return;
+      const status = document.getElementById('formStatus');
+
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        status.textContent = 'Envoi en cours…';
+        const data = new FormData(form);
+        fetch(form.action, {
+          method: 'POST',
+          body: data,
+          headers: { 'Accept': 'application/json' }
+        }).then(response => {
+          if (response.ok) {
+            status.style.color = 'green';
+            status.textContent = 'Merci — message envoyé.';
+            form.reset();
+          } else {
+            response.json().then(res => {
+              status.style.color = 'red';
+              status.textContent = (res && res.error) ? res.error : 'Erreur lors de l\'envoi.';
+            }).catch(() => {
+              status.style.color = 'red';
+              status.textContent = 'Erreur lors de l\'envoi.';
+            });
+          }
+        }).catch(() => {
+          status.style.color = 'red';
+          status.textContent = 'Impossible de contacter le serveur.';
+        });
+      });
+    });
+
+    // Validation et envoi de la commande
+    function validateOrder() {
+      const status = document.getElementById('orderStatus');
+      const name = document.getElementById('orderName').value.trim();
+      const phone = document.getElementById('orderPhone').value.trim();
+      const address = document.getElementById('orderAddress').value.trim();
+      const payment = document.getElementById('paymentMethod').value;
+      const btn = document.getElementById('validateOrderBtn');
+
+      if (!panier || panier.length === 0) {
+        status.style.color = 'red';
+        status.textContent = "Votre panier est vide — ajoutez des produits avant de valider.";
+        return;
+      }
+      if (!name) {
+        status.style.color = 'red';
+        status.textContent = "Veuillez indiquer votre nom.";
+        return;
+      }
+      if (!phone || phone.length < 6) {
+        status.style.color = 'red';
+        status.textContent = "Veuillez indiquer un numéro de téléphone valide.";
+        return;
+      }
+      if (!address) {
+        status.style.color = 'red';
+        status.textContent = "Veuillez indiquer l'adresse de livraison.";
+        return;
+      }
+
+      // Construire le récapitulatif
+      const lines = panier.map(item => `${item.nom} — ${item.prix} F`);
+      const total = panier.reduce((s, i) => s + i.prix, 0);
+      let summary = `Récapitulatif de la commande:\n\n`;
+      summary += lines.join('\n') + `\n\nTotal: ${total} F\n\n`;
+      summary += `Nom: ${name}\nTéléphone: ${phone}\nAdresse: ${address}\nPaiement: ${payment}\n`;
+
+      // confirmation utilisateur
+      const confirmSend = confirm(summary + '\nConfirmez-vous l\'envoi de cette commande ?');
+      if (!confirmSend) return;
+
+      // envoi
+      btn.disabled = true;
+      status.style.color = 'black';
+      status.textContent = 'Envoi de la commande…';
+
+      sendOrder({
+        name, phone, address, payment,
+        items: lines,
+        total
+      }).then(ok => {
+        btn.disabled = false;
+        if (ok) {
+          status.style.color = 'green';
+          status.textContent = 'Commande envoyée. Nous vous contacterons bientôt.';
+          viderPanier();
+          document.getElementById('orderForm').reset();
+        } else {
+          status.style.color = 'red';
+          status.textContent = 'Erreur lors de l\'envoi — réessayez plus tard.';
+        }
+      });
+    }
+
+    async function sendOrder(order) {
+      // envoi via Formspree (remplacez l'URL par votre endpoint si nécessaire)
+      const endpoint = 'https://formspree.io/f/meopblbv';
+      const formData = new FormData();
+      formData.append('name', order.name);
+      formData.append('phone', order.phone);
+      formData.append('address', order.address);
+      formData.append('payment', order.payment);
+      formData.append('total', String(order.total));
+      formData.append('message', order.items.join('\n'));
+      formData.append('_subject', 'Nouvelle commande Aviterroir');
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        });
+        return res.ok;
+      } catch (e) {
+        return false;
+      }
+    }
+  </script>
+</body>
+</html>
